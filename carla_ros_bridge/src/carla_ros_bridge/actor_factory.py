@@ -26,6 +26,7 @@ from carla_ros_bridge.actor_list_sensor import ActorListSensor
 from carla_ros_bridge.camera import Camera, RgbCamera, DepthCamera, SemanticSegmentationCamera, DVSCamera
 from carla_ros_bridge.collision_sensor import CollisionSensor
 from carla_ros_bridge.ego_vehicle import EgoVehicle
+from carla_ros_bridge.ego_drone import EgoDrone
 from carla_ros_bridge.gnss import Gnss
 from carla_ros_bridge.imu import ImuSensor
 from carla_ros_bridge.lane_invasion_sensor import LaneInvasionSensor
@@ -44,6 +45,7 @@ from carla_ros_bridge.tf_sensor import TFSensor
 from carla_ros_bridge.traffic import Traffic, TrafficLight
 from carla_ros_bridge.traffic_lights_sensor import TrafficLightsSensor
 from carla_ros_bridge.vehicle import Vehicle
+from carla_ros_bridge.drone import Drone
 from carla_ros_bridge.walker import Walker
 
 # to generate a random spawning position or vehicles
@@ -289,7 +291,7 @@ class ActorFactory(object):
             parent = self.actors[attach_to]
         else:
             parent = None
-
+    
         if type_id == TFSensor.get_blueprint_name():
             actor = TFSensor(uid=uid, name=name, parent=parent, node=self.node)
 
@@ -356,6 +358,15 @@ class ActorFactory(object):
                 actor = TrafficLight(uid, name, parent, self.node, carla_actor)
             else:
                 actor = Traffic(uid, name, parent, self.node, carla_actor)
+
+        elif carla_actor.type_id.startswith("drone"):
+            if carla_actor.attributes.get('role_name')\
+                     in self.node.parameters['ego_vehicle']['role_name']:
+                actor = EgoDrone(self.world,
+                    uid, name, parent, self.node, carla_actor,
+                    self.node._ego_vehicle_control_applied_callback)
+            
+        
         elif carla_actor.type_id.startswith("vehicle"):
             if carla_actor.attributes.get('role_name')\
                     in self.node.parameters['ego_vehicle']['role_name']:
@@ -364,6 +375,7 @@ class ActorFactory(object):
                     self.node._ego_vehicle_control_applied_callback)
             else:
                 actor = Vehicle(uid, name, parent, self.node, carla_actor)
+        
         elif carla_actor.type_id.startswith("sensor"):
             if carla_actor.type_id.startswith("sensor.camera"):
                 if carla_actor.type_id.startswith("sensor.camera.rgb"):

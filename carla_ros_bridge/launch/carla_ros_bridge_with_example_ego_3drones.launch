@@ -1,0 +1,95 @@
+<!-- -->
+<launch>
+  <!-- CARLA connection -->
+  <arg name='host' default='localhost'/>
+  <arg name='port' default='2000'/>
+  <arg name='timeout' default='10'/>
+
+
+  <arg name="vehicle_filter" default='drone.*'/>
+
+  <!-- hero0 -->
+  <arg name='role_name_hero0' default='hero0'/>
+  <arg name="spawn_point_hero0" default=""/><!-- use comma separated format "x,y,z,roll,pitch,yaw" -->
+
+<!-- Giovanni vehicle -->
+  <arg name='role_name_hero1' default='hero1'/>
+  <arg name="spawn_point_hero1" default=""/><!-- use comma separated format "x,y,z,roll,pitch,yaw" -->
+
+<!-- Vivek vehicle -->
+  <arg name='role_name_hero2' default='hero2'/>
+  <arg name="spawn_point_hero2" default=""/><!-- use comma separated format "x,y,z,roll,pitch,yaw" -->
+
+
+<!-- Meiva vehicle -->
+  <!-- <arg name='role_name_Meiva' default='Meiva'/>
+  <arg name="vehicle_filter_Meiva" default='drone.*'/>
+  <arg name="spawn_point_Meiva" default=""/>use comma separated format "x,y,z,roll,pitch,yaw" -->
+
+
+  <!-- Map to load on startup (either a predefined CARLA town (e.g. 'Town01'), or a OpenDRIVE map file) -->
+  <arg name="town" default=''/>
+
+  <!-- Enable/disable passive mode -->
+  <arg name='passive' default=''/>
+
+  <!-- Synchronous mode-->
+  <arg name='synchronous_mode_wait_for_vehicle_control_command' default='True'/>
+  <arg name='fixed_delta_seconds' default='0.02'/>
+
+
+  <include file="$(find carla_ros_bridge)/launch/carla_ros_bridge.launch">
+    <arg name='host' value='$(arg host)'/>
+    <arg name='port' value='$(arg port)'/>
+    <arg name='town' value='$(arg town)'/>
+    <arg name='timeout' value='$(arg timeout)'/>
+    <arg name='passive' value='$(arg passive)'/>
+    <arg name='synchronous_mode_wait_for_vehicle_control_command' value='$(arg synchronous_mode_wait_for_vehicle_control_command)'/>
+    <arg name='fixed_delta_seconds' value='$(arg fixed_delta_seconds)'/>
+  </include>
+
+  <!-- the hero0, that will be controlled by an agent (e.g. carla_ad_agent) -->
+  <include file="$(find carla_spawn_objects)/launch/carla_example_ego_vehicle.launch">
+    <arg name="objects_definition_file" value='$(find carla_spawn_objects)/config/objects_hero0.json'/>
+    <arg name='role_name' value='$(arg role_name_hero0)'/>
+    <arg name="spawn_point_ego_vehicle" value="$(arg spawn_point_hero0)"/>
+    <arg name="spawn_sensors_only" value="false"/>
+  </include>
+
+   <!-- the hero1, that will be controlled by an agent (e.g. carla_ad_agent) -->
+  <include file="$(find carla_spawn_objects)/launch/carla_example_ego_vehicle.launch">
+    <arg name="objects_definition_file" value='$(find carla_spawn_objects)/config/objects_hero1.json'/>
+    <arg name='role_name' value='$(arg role_name_hero1)'/>
+    <arg name="spawn_point_ego_vehicle" value="$(arg spawn_point_hero1)"/>
+    <arg name="spawn_sensors_only" value="false"/>
+  </include>
+
+
+ <!-- the hero2, that will be controlled by an agent (e.g. carla_ad_agent) -->
+  <include file="$(find carla_spawn_objects)/launch/carla_example_ego_vehicle.launch">
+    <arg name="objects_definition_file" value='$(find carla_spawn_objects)/config/objects_hero2.json'/>
+    <arg name='role_name' value='$(arg role_name_hero2)'/>
+    <arg name="spawn_point_ego_vehicle" value="$(arg spawn_point_hero2)"/>
+    <arg name="spawn_sensors_only" value="false"/>
+  </include>
+
+
+
+ 
+
+  <include file="$(find carla_manual_control)/launch/carla_manual_control_drone.launch">
+    <arg name='role_name' value='$(arg role_name_hero0)'/>
+  </include>
+
+  <include file="$(find carla_manual_control)/launch/carla_manual_control_drone.launch">
+    <arg name='role_name' value='$(arg role_name_hero1)'/>
+  </include>
+
+  <include file="$(find carla_manual_control)/launch/carla_manual_control_drone.launch">
+    <arg name='role_name' value='$(arg role_name_hero2)'/>
+  </include>
+
+  
+
+  
+</launch>

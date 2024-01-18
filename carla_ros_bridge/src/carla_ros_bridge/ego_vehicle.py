@@ -238,7 +238,7 @@ class EgoVehicle(Vehicle):
             vehicle_control.gear = ros_vehicle_control.gear
             self.carla_actor.apply_control(vehicle_control)
             self._vehicle_control_applied_callback(self.get_id())
-
+            
     def enable_autopilot_updated(self, enable_auto_pilot):
         """
         Enable/disable auto pilot

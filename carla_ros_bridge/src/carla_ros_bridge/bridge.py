@@ -12,6 +12,7 @@ Class that handle communication between CARLA and ROS
 """
 
 import os
+import time
 import pkg_resources
 try:
     import queue
@@ -20,6 +21,8 @@ except ImportError:
 import sys
 from distutils.version import LooseVersion
 from threading import Thread, Lock, Event
+
+from numpy import random
 
 import carla
 
@@ -31,6 +34,7 @@ from carla_ros_bridge.actor_factory import ActorFactory
 from carla_ros_bridge.carla_status_publisher import CarlaStatusPublisher
 from carla_ros_bridge.debug_helper import DebugHelper
 from carla_ros_bridge.ego_vehicle import EgoVehicle
+from carla_ros_bridge.ego_drone import EgoDrone
 from carla_ros_bridge.world_info import WorldInfo
 
 from carla_msgs.msg import CarlaControl, CarlaWeatherParameters
@@ -49,7 +53,7 @@ class CarlaRosBridge(CompatibleNode):
 
     # in synchronous mode, if synchronous_mode_wait_for_vehicle_control_command is True,
     # wait for this time until a next tick is triggered.
-    VEHICLE_CONTROL_TIMEOUT = 1.
+    VEHICLE_CONTROL_TIMEOUT = 2.
 
     def __init__(self):
         """
@@ -164,6 +168,15 @@ class CarlaRosBridge(CompatibleNode):
         response = roscomp.get_service_response(SpawnObject)
         if not self.shutdown.is_set():
             try:
+                # if req.type == "*lea*":
+                #     blueprint_library = self.carla_world.get_blueprint_library()
+                #     blueprints = blueprint_library.filter('*lea*')
+                #     spawn_point = carla.Transform(carla.Location(x=28.7, y=28.104216, z=0.690000), carla.Rotation(pitch=0.000000, yaw=0.159198, roll=0.000000))#random.choice(world.get_map().get_spawn_points())
+                #     vehicle: Drone = self.carla_world.spawn_actor(random.choice(blueprints), spawn_point)
+                #     id_ = vehicle.id
+                #     self._registered_actors.append(id_)
+                #     response.id = id_
+                # else: 
                 id_ = self.actor_factory.spawn_actor(req)
                 self._registered_actors.append(id_)
                 response.id = id_
@@ -250,6 +263,8 @@ class CarlaRosBridge(CompatibleNode):
         """
         execution loop for synchronous mode
         """
+
+
         while not self.shutdown.is_set() and roscomp.ok():
             self.process_run_state()
 
@@ -258,7 +273,7 @@ class CarlaRosBridge(CompatibleNode):
                 self._expected_ego_vehicle_control_command_ids = []
                 with self._expected_ego_vehicle_control_command_ids_lock:
                     for actor_id, actor in self.actor_factory.actors.items():
-                        if isinstance(actor, EgoVehicle):
+                        if isinstance(actor, EgoVehicle) or isinstance(actor, EgoDrone):
                             self._expected_ego_vehicle_control_command_ids.append(
                                 actor_id)
 
@@ -273,7 +288,7 @@ class CarlaRosBridge(CompatibleNode):
                 frame))
             self._update(frame, world_snapshot.timestamp.elapsed_seconds)
             self.logdebug("Waiting for sensor data finished.")
-
+            # print(world_snapshot.timestamp,"ama naw bridja")
             if self.parameters['synchronous_mode_wait_for_vehicle_control_command']:
                 # wait for all ego vehicles to send a vehicle control command
                 if self._expected_ego_vehicle_control_command_ids:
@@ -440,6 +455,7 @@ def main(args=None):
                         parameters["town"], carla_world.get_map().name))
                     carla_world = carla_client.load_world(parameters["town"])
             carla_world.tick()
+            
 
         carla_bridge.initialize_bridge(carla_client.get_world(), parameters)
 

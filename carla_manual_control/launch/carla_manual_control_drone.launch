@@ -1,12 +1,12 @@
 <!-- -->
 <launch>
-  <arg name="role_name" default="ego_vehicle"/>
+  <arg name="role_name" default="hero"/>
 
   <!-- <node pkg="carla_manual_control" type="carla_manual_control.py" name="carla_manual_control_$(arg role_name)" output="screen">
     <param name="role_name" value="$(arg role_name)"/>
   </node> -->
 
-   <node pkg="carla_manual_control" type="carla_manual_control.py" name="carla_manual_control_$(arg role_name)" output="screen">
+   <node pkg="carla_manual_control" type="dronela_manual_control_drone.py" name="carla_manual_control_$(arg role_name)" output="screen">
     <param name="role_name" value="$(arg role_name)"/>
   </node>
 

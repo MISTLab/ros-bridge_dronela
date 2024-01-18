@@ -95,7 +95,7 @@ class CarlaSpawnObjects(CompatibleNode):
                 found_sensor_actor_list = True
             elif actor_type == "sensor":
                 global_sensors.append(actor)
-            elif actor_type == "vehicle" or actor_type == "walker":
+            elif actor_type == "vehicle" or actor_type == "walker" or actor_type == "drone":
                 vehicles.append(actor)
             else:
                 self.logwarn(

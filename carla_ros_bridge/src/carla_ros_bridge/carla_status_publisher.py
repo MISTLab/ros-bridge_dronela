@@ -47,6 +47,7 @@ class CarlaStatusPublisher(object):
         publish the current status
 
         """
+    
         status_msg = CarlaStatus()
         status_msg.frame = self.frame
         status_msg.synchronous_mode = self.synchronous_mode
@@ -61,6 +62,7 @@ class CarlaStatusPublisher(object):
         if self.synchronous_mode_running != running:
             self.synchronous_mode_running = running
             self.publish()
+            print("publish synchronous_mode_running")
 
     def set_frame(self, frame):
         """
@@ -69,3 +71,6 @@ class CarlaStatusPublisher(object):
         if self.frame != frame:
             self.frame = frame
             self.publish()
+        
+            
+

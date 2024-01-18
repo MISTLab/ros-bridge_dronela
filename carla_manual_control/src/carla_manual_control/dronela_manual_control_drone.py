@@ -33,6 +33,8 @@ import math
 from threading import Thread
 
 import numpy
+
+
 from transforms3d.euler import quat2euler
 try:
     import pygame
@@ -57,6 +59,8 @@ try:
     from pygame.locals import K_s
     from pygame.locals import K_w
     from pygame.locals import K_b
+    from pygame import KEYDOWN
+    from pygame import KEYUP
 except ImportError:
     raise RuntimeError('cannot import pygame, make sure pygame package is installed')
 
@@ -67,7 +71,9 @@ from ros_compatibility.qos import QoSProfile, DurabilityPolicy
 from carla_msgs.msg import CarlaStatus
 from carla_msgs.msg import CarlaEgoVehicleInfo
 from carla_msgs.msg import CarlaEgoVehicleStatus
-from carla_msgs.msg import CarlaEgoVehicleControl
+
+from carla_msgs.msg import DronelaEgoDroneControl
+
 from carla_msgs.msg import CarlaLaneInvasionEvent
 from carla_msgs.msg import CarlaCollisionEvent
 from nav_msgs.msg import Odometry
@@ -91,7 +97,7 @@ class ManualControl(CompatibleNode):
         self.role_name = self.get_param("role_name", "ego_vehicle")
         self.hud = HUD(self.role_name, resolution['width'], resolution['height'], self)
         self.controller = KeyboardControl(self.role_name, self.hud, self)
-
+        self.resolution=resolution
         self.image_subscriber = self.new_subscription(
             Image, "/carla/{}/rgb_view/image".format(self.role_name),
             self.on_view_image, qos_profile=10)
@@ -137,8 +143,8 @@ class ManualControl(CompatibleNode):
         array = numpy.reshape(array, (image.height, image.width, 4))
         array = array[:, :, :3]
         array = array[:, :, ::-1]
-        self._surface = pygame.surfarray.make_surface(array.swapaxes(0, 1))
-
+        surface = pygame.surfarray.make_surface(array.swapaxes(0, 1))
+        self._surface = pygame.transform.scale(surface, (self.resolution['width'], self.resolution['height']))
     def render(self, game_clock, display):
         """
         render the current image
@@ -165,19 +171,20 @@ class KeyboardControl(object):
 
     def __init__(self, role_name, hud, node):
         self.role_name = role_name
+        
         self.hud = hud
         self.node = node
 
         self._autopilot_enabled = False
-        self._control = CarlaEgoVehicleControl()
-        self._steer_cache = 0.0
+        self._control = DronelaEgoDroneControl()
+        
 
         fast_qos = QoSProfile(depth=10)
         fast_latched_qos = QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
 
         self.vehicle_control_manual_override_publisher = self.node.new_publisher(
             Bool,
-            "/carla/{}/vehicle_control_manual_override".format(self.role_name),
+            "/carla/{}/drone_control_manual_override".format(self.role_name),
             qos_profile=fast_latched_qos)
 
         self.vehicle_control_manual_override = True
@@ -187,9 +194,9 @@ class KeyboardControl(object):
             "/carla/{}/enable_autopilot".format(self.role_name),
             qos_profile=fast_qos)
 
-        self.vehicle_control_publisher = self.node.new_publisher(
-            CarlaEgoVehicleControl,
-            "/carla/{}/vehicle_control_cmd_manual".format(self.role_name),
+        self.drone_control_publisher = self.node.new_publisher(
+            DronelaEgoDroneControl,
+            "/carla/{}/drone_control_cmd_manual".format(self.role_name),
             qos_profile=fast_qos)
 
         self.carla_status_subscriber = self.node.new_subscription(
@@ -202,6 +209,9 @@ class KeyboardControl(object):
 
         self.set_vehicle_control_manual_override(
             self.vehicle_control_manual_override)  # disable manual override
+        
+        self.max_velocity=8
+        self.max_yaw_rate=1.5
 
     def set_vehicle_control_manual_override(self, enable):
         """
@@ -235,25 +245,27 @@ class KeyboardControl(object):
                 elif event.key == K_b:
                     self.vehicle_control_manual_override = not self.vehicle_control_manual_override
                     self.set_vehicle_control_manual_override(self.vehicle_control_manual_override)
-                if event.key == K_q:
-                    self._control.gear = 1 if self._control.reverse else -1
-                elif event.key == K_m:
-                    self._control.manual_gear_shift = not self._control.manual_gear_shift
-                    self.hud.notification(
-                        '%s Transmission' %
-                        ('Manual' if self._control.manual_gear_shift else 'Automatic'))
-                elif self._control.manual_gear_shift and event.key == K_COMMA:
-                    self._control.gear = max(-1, self._control.gear - 1)
-                elif self._control.manual_gear_shift and event.key == K_PERIOD:
-                    self._control.gear = self._control.gear + 1
-                elif event.key == K_p:
+                # if event.key == K_q:
+                #     self._control.gear = 1 if self._control.reverse else -1
+                # elif event.key == K_m:
+                #     self._control.manual_gear_shift = not self._control.manual_gear_shift
+                #     self.hud.notification(
+                #         '%s Transmission' %
+                #         ('Manual' if self._control.manual_gear_shift else 'Automatic'))
+                # elif self._control.manual_gear_shift and event.key == K_COMMA:
+                #     self._control.gear = max(-1, self._control.gear - 1)
+                # elif self._control.manual_gear_shift and event.key == K_PERIOD:
+                #     self._control.gear = self._control.gear + 1
+                # elif event.key == K_p:
+                if event.key == K_p:
                     self._autopilot_enabled = not self._autopilot_enabled
                     self.set_autopilot(self._autopilot_enabled)
                     self.hud.notification('Autopilot %s' %
                                           ('On' if self._autopilot_enabled else 'Off'))
-        if not self._autopilot_enabled and self.vehicle_control_manual_override:
-            self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
-            self._control.reverse = self._control.gear < 0
+            if not self._autopilot_enabled and self.vehicle_control_manual_override:
+                if event.type == KEYDOWN or event.type == KEYUP:
+                    self._parse_vehicle_keys(event.type,event.key)
+            # self._control.reverse = self._control.gear < 0
 
     def _on_new_carla_frame(self, data):
         """
@@ -264,26 +276,72 @@ class KeyboardControl(object):
         """
         if not self._autopilot_enabled and self.vehicle_control_manual_override:
             try:
-                self.vehicle_control_publisher.publish(self._control)
+                self.drone_control_publisher.publish(self._control)
             except Exception as error:
                 self.node.logwarn("Could not send vehicle control: {}".format(error))
 
-    def _parse_vehicle_keys(self, keys, milliseconds):
+    def _parse_vehicle_keys(self, type, key):
         """
         parse key events
         """
-        self._control.throttle = 1.0 if keys[K_UP] or keys[K_w] else 0.0
-        steer_increment = 5e-4 * milliseconds
-        if keys[K_LEFT] or keys[K_a]:
-            self._steer_cache -= steer_increment
-        elif keys[K_RIGHT] or keys[K_d]:
-            self._steer_cache += steer_increment
-        else:
-            self._steer_cache = 0.0
-        self._steer_cache = min(0.7, max(-0.7, self._steer_cache))
-        self._control.steer = round(self._steer_cache, 1)
-        self._control.brake = 1.0 if keys[K_DOWN] or keys[K_s] else 0.0
-        self._control.hand_brake = bool(keys[K_SPACE])
+
+        if key==K_w:
+            if type==KEYDOWN:
+                self._control.vforward=self.max_velocity
+            elif type==KEYUP:
+                self._control.vforward=0
+        if key==K_s:
+            if type==KEYDOWN:
+                self._control.vforward=-self.max_velocity
+            elif type==KEYUP:
+                self._control.vforward=0
+        #-----------left
+        if key==K_a:
+            if type==KEYDOWN:
+                self._control.vleft=self.max_velocity
+            elif type==KEYUP:
+                self._control.vleft=0
+        if key==K_d:
+            if type==KEYDOWN:
+                self._control.vleft=-self.max_velocity
+            elif type==KEYUP:
+                self._control.vleft=0
+        #---------up
+        if key==K_UP:
+            if type==KEYDOWN:
+                self._control.vz=self.max_velocity
+            elif type==KEYUP:
+                self._control.vz=0
+        if key==K_DOWN:
+            if type==KEYDOWN:
+                self._control.vz=-self.max_velocity
+            elif type==KEYUP:
+                self._control.vz=0
+
+        #---------yaw
+        if key==K_LEFT:
+            if type==KEYDOWN:
+                self._control.yawrate=self.max_yaw_rate
+            elif type==KEYUP:
+                self._control.yawrate=0
+        if key==K_RIGHT:
+            if type==KEYDOWN:
+                self._control.yawrate=-self.max_yaw_rate
+            elif type==KEYUP:
+                self._control.yawrate=0
+        # if keys[K_UP] or keys[K_w]:
+        # self._control.vz = 1.0 if keys[K_UP] or keys[K_w] else 0.0
+        # steer_increment = 5e-4 * milliseconds
+        # if keys[K_LEFT] or keys[K_a]:
+        #     self._steer_cache -= steer_increment
+        # elif keys[K_RIGHT] or keys[K_d]:
+        #     self._steer_cache += steer_increment
+        # else:
+        #     self._steer_cache = 0.0
+        # self._steer_cache = min(0.7, max(-0.7, self._steer_cache))
+        # self._control.steer = round(self._steer_cache, 1)
+        # self._control.brake = 1.0 if keys[K_DOWN] or keys[K_s] else 0.0
+        # self._control.hand_brake = bool(keys[K_SPACE])
 
     @staticmethod
     def _is_quit_shortcut(key):
@@ -615,7 +673,7 @@ def main(args=None):
     roscomp.init("manual_control", args=args)
 
     # resolution should be similar to spawned camera with role-name 'view'
-    resolution = {"width": 1024, "height": 800}
+    resolution = {"width": 2000, "height": 1500}
 
     pygame.init()
     pygame.font.init()
@@ -635,7 +693,7 @@ def main(args=None):
         spin_thread.start()
 
         while roscomp.ok():
-            clock.tick_busy_loop(60)
+            #clock.tick_busy_loop(200)
             if manual_control_node.render(clock, display):
                 return
             pygame.display.flip()

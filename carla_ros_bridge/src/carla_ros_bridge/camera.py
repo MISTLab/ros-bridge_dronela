@@ -17,6 +17,7 @@ from abc import abstractmethod
 import carla
 import numpy
 import transforms3d
+import cv2
 from cv_bridge import CvBridge
 
 import carla_common.transforms as trans
@@ -452,7 +453,7 @@ class DVSCamera(Camera):
                                                 ('x', numpy.uint16),
                                                 ('y', numpy.uint16),
                                                 ('t', numpy.int64),
-                                                ('pol', numpy.bool)
+                                                ('pol', bool)
                                             ]))
         carla_image_data_array = numpy.zeros(
             (carla_dvs_event_array.height, carla_dvs_event_array.width, 3),
