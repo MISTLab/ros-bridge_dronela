@@ -20,4 +20,22 @@
 
 ## Getting started and documentation
 
-Installation instructions and further documentation of the ROS bridge and additional packages are found [__here__](https://carla.readthedocs.io/projects/ros-bridge/en/latest/).
+Installation:
+```bash
+mkdir -p ~/dronela-ros-bridge/catkin_ws/src
+cd ~/dronela-ros-bridge
+
+git clone --recurse-submodules https://github.com/MISTLab/ros-bridge_dronela.git catkin_ws/src/ros-bridge
+
+source /opt/ros/noetic/setup.bash
+
+cd catkin_ws
+rosdep update
+rosdep install --from-paths src --ignore-src -r
+
+
+catkin_make
+```
+
+
+instructions and further documentation of the ROS bridge and additional packages are found [__here__](https://carla.readthedocs.io/projects/ros-bridge/en/latest/).
