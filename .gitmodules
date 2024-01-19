@@ -1,0 +1,4 @@
+[submodule "carla_msgs"]
+	path = carla_msgs
+	url = https://github.com/MISTLab/ros-dronela-msgs.git
+	branch = master
