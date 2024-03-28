@@ -17,7 +17,8 @@ if(${ROS_VERSION} EQUAL 1)
   catkin_package(CATKIN_DEPENDS rospy)
 
   catkin_install_python(
-    PROGRAMS src/carla_manual_control/carla_manual_control.py DESTINATION
+    PROGRAMS src/carla_manual_control/carla_manual_control.py 
+    src/carla_manual_control/dronela_manual_control_drone.py DESTINATION
     ${CATKIN_PACKAGE_BIN_DESTINATION})
 
   install(DIRECTORY launch/

@@ -35,7 +35,7 @@ class CarlaStatusPublisher(object):
         self.frame = 0
 
         callback_group = roscomp.callback_groups.ReentrantCallbackGroup()
-        self.carla_status_publisher = self.node.new_publisher(CarlaStatus, "/carla/status", qos_profile=10,
+        self.carla_status_publisher = self.node.new_publisher(CarlaStatus, "/status", qos_profile=10,
                                                               callback_group=callback_group)
         self.publish()
 

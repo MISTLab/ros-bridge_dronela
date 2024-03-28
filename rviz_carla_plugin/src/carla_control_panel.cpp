@@ -130,28 +130,28 @@ CarlaControlPanel::CarlaControlPanel(QWidget *parent)
   setSimulationButtonStatus(false);
   setScenarioRunnerStatus(false);
 
-  mCarlaStatusSubscriber = mNodeHandle.subscribe("/carla/status", 1000, &CarlaControlPanel::carlaStatusChanged, this);
-  mCarlaControlPublisher = mNodeHandle.advertise<carla_msgs::CarlaControl>("/carla/control", 10);
+  mCarlaStatusSubscriber = mNodeHandle.subscribe("/status", 1000, &CarlaControlPanel::carlaStatusChanged, this);
+  mCarlaControlPublisher = mNodeHandle.advertise<carla_msgs::CarlaControl>("/control", 10);
   mEgoVehicleStatusSubscriber = mNodeHandle.subscribe(
-    "/carla/ego_vehicle/vehicle_status", 1000, &CarlaControlPanel::egoVehicleStatusChanged, this);
+    "/ego_vehicle/vehicle_status", 1000, &CarlaControlPanel::egoVehicleStatusChanged, this);
   mEgoVehicleOdometrySubscriber
-    = mNodeHandle.subscribe("/carla/ego_vehicle/odometry", 1000, &CarlaControlPanel::egoVehicleOdometryChanged, this);
+    = mNodeHandle.subscribe("/ego_vehicle/odometry", 1000, &CarlaControlPanel::egoVehicleOdometryChanged, this);
 
   mCameraPosePublisher
     = mNodeHandle.advertise<geometry_msgs::Pose>("carla/ego_vehicle/spectator_pose", 10, true);
 
   mEgoVehicleControlManualOverridePublisher
-    = mNodeHandle.advertise<std_msgs::Bool>("/carla/ego_vehicle/vehicle_control_manual_override", 1, true);
+    = mNodeHandle.advertise<std_msgs::Bool>("/ego_vehicle/vehicle_control_manual_override", 1, true);
 
   mExecuteScenarioClient
     = mNodeHandle.serviceClient<carla_ros_scenario_runner_types::ExecuteScenario>("/scenario_runner/execute_scenario");
   mScenarioRunnerStatusSubscriber
     = mNodeHandle.subscribe("/scenario_runner/status", 10, &CarlaControlPanel::scenarioRunnerStatusChanged, this);
 
-  mTwistPublisher = mNodeHandle.advertise<geometry_msgs::Twist>("/carla/ego_vehicle/twist", 1);
+  mTwistPublisher = mNodeHandle.advertise<geometry_msgs::Twist>("/ego_vehicle/twist", 1);
 
   mScenarioSubscriber
-    = mNodeHandle.subscribe("/carla/available_scenarios", 1, &CarlaControlPanel::carlaScenariosChanged, this);
+    = mNodeHandle.subscribe("/available_scenarios", 1, &CarlaControlPanel::carlaScenariosChanged, this);
 
   // //initially set the camera
   QTimer::singleShot(1000, this, SLOT(updateCameraPos()));

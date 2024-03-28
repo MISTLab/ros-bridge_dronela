@@ -53,19 +53,19 @@ class CarlaAdAgent(Agent):
         self._target_speed = 0.
 
         self.speed_command_publisher = self.new_publisher(
-            Float64, "/carla/{}/speed_command".format(role_name),
+            Float64, "/{}/speed_command".format(role_name),
             QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
 
         self._odometry_subscriber = self.new_subscription(
             Odometry,
-            "/carla/{}/odometry".format(role_name),
+            "/{}/odometry".format(role_name),
             self.odometry_cb,
             qos_profile=10
         )
 
         self._target_speed_subscriber = self.new_subscription(
             Float64,
-            "/carla/{}/target_speed".format(role_name),
+            "/{}/target_speed".format(role_name),
             self.target_speed_cb,
             qos_profile=QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
         )
@@ -74,19 +74,19 @@ class CarlaAdAgent(Agent):
 
             self._objects_subscriber = self.new_subscription(
                 ObjectArray,
-                "/carla/{}/objects".format(role_name),
+                "/{}/objects".format(role_name),
                 self.objects_cb,
                 qos_profile=10
             )
             self._traffic_light_status_subscriber = self.new_subscription(
                 CarlaTrafficLightStatusList,
-                "/carla/traffic_lights/status",
+                "/traffic_lights/status",
                 self.traffic_light_status_cb,
                 qos_profile=QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
             )
             self._traffic_light_info_subscriber = self.new_subscription(
                 CarlaTrafficLightInfoList,
-                "/carla/traffic_lights/info",
+                "/traffic_lights/info",
                 self.traffic_light_info_cb,
                 qos_profile=QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
             )

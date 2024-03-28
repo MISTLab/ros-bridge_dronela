@@ -79,7 +79,7 @@ class CarlaToRosWaypointConverter(CompatibleNode):
         self.current_route = None
         self.goal_subscriber = self.new_subscription(
             PoseStamped,
-            "/carla/{}/goal".format(self.role_name),
+            "/{}/goal".format(self.role_name),
             self.on_goal,
             qos_profile=10)
 
@@ -232,7 +232,7 @@ class CarlaToRosWaypointConverter(CompatibleNode):
         self.loginfo("Waiting for CARLA world (topic: /carla/world_info)...")
         try:
             self.wait_for_message(
-                "/carla/world_info",
+                "/world_info",
                 CarlaWorldInfo,
                 qos_profile=QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL),
                 timeout=15.0)

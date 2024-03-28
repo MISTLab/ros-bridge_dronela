@@ -41,19 +41,19 @@ class TwistToVehicleControl(CompatibleNode):  # pylint: disable=too-few-public-m
 
         self.new_subscription(
             CarlaEgoVehicleInfo,
-            "/carla/{}/vehicle_info".format(self.role_name),
+            "/{}/vehicle_info".format(self.role_name),
             self.update_vehicle_info,
             qos_profile=QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL))
 
         self.new_subscription(
             Twist,
-            "/carla/{}/twist".format(self.role_name),
+            "/{}/twist".format(self.role_name),
             self.twist_received,
             qos_profile=10)
 
         self.pub = self.new_publisher(
             CarlaEgoVehicleControl,
-            "/carla/{}/vehicle_control_cmd".format(self.role_name),
+            "/{}/vehicle_control_cmd".format(self.role_name),
             qos_profile=10)
 
     def update_vehicle_info(self, vehicle_info):

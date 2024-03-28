@@ -127,7 +127,7 @@ class EgoDrone(Drone):
         #world.on_tick(lambda world_snap_shot:self.on_event_tick_world(world_snap_shot))
         self.carla_status_subscriber = self.node.new_subscription(
             CarlaStatus,
-            "/carla/status",
+            "/status",
             self._on_new_carla_frame,
             qos_profile=10)
         

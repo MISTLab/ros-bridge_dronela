@@ -28,7 +28,7 @@ PclRecorderROS2::PclRecorderROS2() : Node("pcl_recorder")
   }
   auto sub_opt = rclcpp::SubscriptionOptions();
   sub_opt.callback_group = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
-  sub = this->create_subscription<sensor_msgs::msg::PointCloud2>("/carla/" + roleName + "/lidar", 10, std::bind(&PclRecorderROS2::callback, this, std::placeholders::_1), sub_opt);
+  sub = this->create_subscription<sensor_msgs::msg::PointCloud2>("/" + roleName + "/lidar", 10, std::bind(&PclRecorderROS2::callback, this, std::placeholders::_1), sub_opt);
 }
 
 void PclRecorderROS2::callback(const sensor_msgs::msg::PointCloud2::SharedPtr cloud)

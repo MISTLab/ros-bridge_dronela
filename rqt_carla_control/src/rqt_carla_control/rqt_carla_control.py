@@ -62,13 +62,13 @@ class CarlaControlPlugin(Plugin):
         self.carla_status = None
         self.carla_status_subscriber = self._node.new_subscription(
             CarlaStatus,
-            "/carla/status",
+            "/status",
             self.carla_status_changed,
             qos_profile=10)
 
         self.carla_control_publisher = self._node.new_publisher(
             CarlaControl,
-            "/carla/control",
+            "/control",
             qos_profile=10)
 
         self._widget.pushButtonPlayPause.setDisabled(True)

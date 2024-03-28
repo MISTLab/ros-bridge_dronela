@@ -9,7 +9,7 @@ def generate_launch_description():
         launch.actions.DeclareLaunchArgument(
             name='objects_definition_file',
             default_value=get_package_share_directory(
-                'carla_spawn_objects') + '/objects_hero0.json'
+                'carla_spawn_objects') + '/objects_2drones.json'
         ),
         launch.actions.DeclareLaunchArgument(
             name='role_name',
@@ -37,17 +37,18 @@ def generate_launch_description():
                 'spawn_point_ego_vehicle': launch.substitutions.LaunchConfiguration('spawn_point_ego_vehicle'),
                 'spawn_sensors_only': launch.substitutions.LaunchConfiguration('spawn_sensors_only')
             }.items()
-        ),
-        launch.actions.IncludeLaunchDescription(
-            launch.launch_description_sources.PythonLaunchDescriptionSource(
-                os.path.join(get_package_share_directory(
-                    'carla_spawn_objects'), 'set_initial_pose.launch.py')
-            ),
-            launch_arguments={
-                'role_name': launch.substitutions.LaunchConfiguration('role_name'),
-                'control_id': launch.substitutions.LaunchConfiguration('control_id')
-            }.items()
         )
+        # ),
+        # launch.actions.IncludeLaunchDescription(
+        #     launch.launch_description_sources.PythonLaunchDescriptionSource(
+        #         os.path.join(get_package_share_directory(
+        #             'carla_spawn_objects'), 'set_initial_pose.launch.py')
+        #     ),
+        #     launch_arguments={
+        #         'role_name': launch.substitutions.LaunchConfiguration('role_name'),
+        #         'control_id': launch.substitutions.LaunchConfiguration('control_id')
+        #     }.items()
+        # )
     ])
     return ld
 

@@ -59,7 +59,7 @@ class Agent(CompatibleNode):
         role_name = self.get_param("role_name", "ego_vehicle")
         self.loginfo("Waiting for vehicle_info...")
         vehicle_info = self.wait_for_message(
-            "/carla/{}/vehicle_info".format(role_name),
+            "/{}/vehicle_info".format(role_name),
             CarlaEgoVehicleInfo,
             qos_profile=QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL))
         self.loginfo("Vehicle info received.")

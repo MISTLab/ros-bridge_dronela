@@ -35,7 +35,7 @@ class SetInitialPose(CompatibleNode):
 
         self.transform_publisher = self.new_publisher(
             Pose,
-            "/carla/{}/{}/set_transform".format(self.role_name, self.control_id),
+            "/{}/{}/set_transform".format(self.role_name, self.control_id),
             qos_profile=10)
 
         self.initial_pose_subscriber = self.new_subscription(

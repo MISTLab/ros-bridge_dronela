@@ -127,7 +127,7 @@ class CarlaAckermannControl(CompatibleNode):
         # ackermann drive commands
         self.control_subscriber = self.new_subscription(
             AckermannDrive,
-            "/carla/" + self.role_name + "/ackermann_cmd",
+            "/" + self.role_name + "/ackermann_cmd",
             self.ackermann_command_updated,
             qos_profile=10
         )
@@ -135,7 +135,7 @@ class CarlaAckermannControl(CompatibleNode):
         # current status of the vehicle
         self.vehicle_status_subscriber = self.new_subscription(
             CarlaEgoVehicleStatus,
-            "/carla/" + self.role_name + "/vehicle_status",
+            "/" + self.role_name + "/vehicle_status",
             self.vehicle_status_updated,
             qos_profile=10
         )
@@ -143,7 +143,7 @@ class CarlaAckermannControl(CompatibleNode):
         # vehicle info
         self.vehicle_info_subscriber = self.new_subscription(
             CarlaEgoVehicleInfo,
-            "/carla/" + self.role_name + "/vehicle_info",
+            "/" + self.role_name + "/vehicle_info",
             self.vehicle_info_updated,
             qos_profile=10
         )
@@ -151,13 +151,13 @@ class CarlaAckermannControl(CompatibleNode):
         # to send command to carla
         self.carla_control_publisher = self.new_publisher(
             CarlaEgoVehicleControl,
-            "/carla/" + self.role_name + "/vehicle_control_cmd",
+            "/" + self.role_name + "/vehicle_control_cmd",
             qos_profile=1)
 
         # report controller info
         self.control_info_publisher = self.new_publisher(
             EgoVehicleControlInfo,
-            "/carla/" + self.role_name + "/ackermann_control/control_info",
+            "/" + self.role_name + "/ackermann_control/control_info",
             qos_profile=1)
 
     if ROS_VERSION == 1:

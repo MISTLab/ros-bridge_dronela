@@ -53,8 +53,8 @@ class CarlaSpawnObjects(CompatibleNode):
         self.vehicles_sensors = []
         self.global_sensors = []
 
-        self.spawn_object_service = self.new_client(SpawnObject, "/carla/spawn_object")
-        self.destroy_object_service = self.new_client(DestroyObject, "/carla/destroy_object")
+        self.spawn_object_service = self.new_client(SpawnObject, "/spawn_object")
+        self.destroy_object_service = self.new_client(DestroyObject, "/destroy_object")
 
     def spawn_object(self, spawn_object_request):
         response_id = -1
@@ -108,7 +108,7 @@ class CarlaSpawnObjects(CompatibleNode):
 
         if self.spawn_sensors_only is True:
             # get vehicle id from topic /carla/actor_list for all vehicles listed in config file
-            actor_info_list = self.wait_for_message("/carla/actor_list", CarlaActorList)
+            actor_info_list = self.wait_for_message("/actor_list", CarlaActorList)
             for vehicle in vehicles:
                 for actor_info in actor_info_list.actors:
                     if actor_info.type == vehicle["type"] and actor_info.rolename == vehicle["id"]:
@@ -279,9 +279,9 @@ class CarlaSpawnObjects(CompatibleNode):
 
     def create_spawn_point(self, x, y, z, roll, pitch, yaw):
         spawn_point = Pose()
-        spawn_point.position.x = x
-        spawn_point.position.y = y
-        spawn_point.position.z = z
+        spawn_point.position.x = float(x)
+        spawn_point.position.y = float(y)
+        spawn_point.position.z = float(z)
         quat = euler2quat(math.radians(roll), math.radians(pitch), math.radians(yaw))
 
         spawn_point.orientation.w = quat[0]

@@ -25,7 +25,7 @@ def launch_carla_spawn_object(context, *args, **kwargs):
     return [carla_spawn_objects_launch]
 
 def launch_target_speed_publisher(context, *args, **kwargs):
-    topic_name = "/carla/" + launch.substitutions.LaunchConfiguration('role_name').perform(context) + "/target_speed"
+    topic_name = "/" + launch.substitutions.LaunchConfiguration('role_name').perform(context) + "/target_speed"
     data_string = "{'data': " + launch.substitutions.LaunchConfiguration('target_speed').perform(context) + "}"
     return [
         launch.actions.ExecuteProcess(

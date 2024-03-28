@@ -99,15 +99,15 @@ class ManualControl(CompatibleNode):
         self.controller = KeyboardControl(self.role_name, self.hud, self)
         self.resolution=resolution
         self.image_subscriber = self.new_subscription(
-            Image, "/carla/{}/rgb_view/image".format(self.role_name),
+            Image, "/{}/rgb_view/image".format(self.role_name),
             self.on_view_image, qos_profile=10)
 
         self.collision_subscriber = self.new_subscription(
-            CarlaCollisionEvent, "/carla/{}/collision".format(self.role_name),
+            CarlaCollisionEvent, "/{}/collision".format(self.role_name),
             self.on_collision, qos_profile=10)
 
         self.lane_invasion_subscriber = self.new_subscription(
-            CarlaLaneInvasionEvent, "/carla/{}/lane_invasion".format(self.role_name),
+            CarlaLaneInvasionEvent, "/{}/lane_invasion".format(self.role_name),
             self.on_lane_invasion, qos_profile=10)
 
     def on_collision(self, data):
@@ -184,24 +184,24 @@ class KeyboardControl(object):
 
         self.vehicle_control_manual_override_publisher = self.node.new_publisher(
             Bool,
-            "/carla/{}/drone_control_manual_override".format(self.role_name),
+            "/{}/drone_control_manual_override".format(self.role_name),
             qos_profile=fast_latched_qos)
 
         self.vehicle_control_manual_override = True
 
         self.auto_pilot_enable_publisher = self.node.new_publisher(
             Bool,
-            "/carla/{}/enable_autopilot".format(self.role_name),
+            "/{}/enable_autopilot".format(self.role_name),
             qos_profile=fast_qos)
 
         self.drone_control_publisher = self.node.new_publisher(
             DronelaEgoDroneControl,
-            "/carla/{}/drone_control_cmd_manual".format(self.role_name),
+            "/{}/drone_control_cmd_manual".format(self.role_name),
             qos_profile=fast_qos)
 
         self.carla_status_subscriber = self.node.new_subscription(
             CarlaStatus,
-            "/carla/status",
+            "/status",
             self._on_new_carla_frame,
             qos_profile=10)
 
@@ -210,7 +210,7 @@ class KeyboardControl(object):
         self.set_vehicle_control_manual_override(
             self.vehicle_control_manual_override)  # disable manual override
         
-        self.max_velocity=8
+        self.max_velocity=8.0
         self.max_yaw_rate=1.5
 
     def set_vehicle_control_manual_override(self, enable):
@@ -289,46 +289,46 @@ class KeyboardControl(object):
             if type==KEYDOWN:
                 self._control.vforward=self.max_velocity
             elif type==KEYUP:
-                self._control.vforward=0
+                self._control.vforward=0.0
         if key==K_s:
             if type==KEYDOWN:
                 self._control.vforward=-self.max_velocity
             elif type==KEYUP:
-                self._control.vforward=0
+                self._control.vforward=0.0
         #-----------left
         if key==K_a:
             if type==KEYDOWN:
                 self._control.vleft=self.max_velocity
             elif type==KEYUP:
-                self._control.vleft=0
+                self._control.vleft=0.0
         if key==K_d:
             if type==KEYDOWN:
                 self._control.vleft=-self.max_velocity
             elif type==KEYUP:
-                self._control.vleft=0
+                self._control.vleft=0.0
         #---------up
         if key==K_UP:
             if type==KEYDOWN:
                 self._control.vz=self.max_velocity
             elif type==KEYUP:
-                self._control.vz=0
+                self._control.vz=0.0
         if key==K_DOWN:
             if type==KEYDOWN:
                 self._control.vz=-self.max_velocity
             elif type==KEYUP:
-                self._control.vz=0
+                self._control.vz=0.0
 
         #---------yaw
         if key==K_LEFT:
             if type==KEYDOWN:
                 self._control.yawrate=self.max_yaw_rate
             elif type==KEYUP:
-                self._control.yawrate=0
+                self._control.yawrate=0.0
         if key==K_RIGHT:
             if type==KEYDOWN:
                 self._control.yawrate=-self.max_yaw_rate
             elif type==KEYUP:
-                self._control.yawrate=0
+                self._control.yawrate=0.0
         # if keys[K_UP] or keys[K_w]:
         # self._control.vz = 1.0 if keys[K_UP] or keys[K_w] else 0.0
         # steer_increment = 5e-4 * milliseconds
@@ -375,45 +375,45 @@ class HUD(object):
         self.vehicle_status = CarlaEgoVehicleStatus()
 
         self.vehicle_status_subscriber = node.new_subscription(
-            CarlaEgoVehicleStatus, "/carla/{}/vehicle_status".format(self.role_name),
+            CarlaEgoVehicleStatus, "/{}/vehicle_status".format(self.role_name),
             self.vehicle_status_updated, qos_profile=10)
 
         self.vehicle_info = CarlaEgoVehicleInfo()
         self.vehicle_info_subscriber = node.new_subscription(
             CarlaEgoVehicleInfo,
-            "/carla/{}/vehicle_info".format(self.role_name),
+            "/{}/vehicle_info".format(self.role_name),
             self.vehicle_info_updated, 
             qos_profile=QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL))
 
-        self.x, self.y, self.z = 0, 0, 0
-        self.yaw = 0
-        self.latitude = 0
-        self.longitude = 0
+        self.x, self.y, self.z = 0.0, 0.0, 0.0
+        self.yaw = 0.0
+        self.latitude = 0.0
+        self.longitude = 0.0
         self.manual_control = False
 
         self.gnss_subscriber = node.new_subscription(
             NavSatFix,
-            "/carla/{}/gnss".format(self.role_name),
+            "/{}/gnss".format(self.role_name),
             self.gnss_updated,
             qos_profile=10)
 
         self.odometry_subscriber = node.new_subscription(
             Odometry,
-            "/carla/{}/odometry".format(self.role_name),
+            "/{}/odometry".format(self.role_name),
             self.odometry_updated,
             qos_profile=10
         )
 
         self.manual_control_subscriber = node.new_subscription(
             Bool,
-            "/carla/{}/vehicle_control_manual_override".format(self.role_name),
+            "/{}/vehicle_control_manual_override".format(self.role_name),
             self.manual_control_override_updated,
             qos_profile=10)
 
         self.carla_status = CarlaStatus()
         self.status_subscriber = node.new_subscription(
             CarlaStatus,
-            "/carla/status",
+            "/status",
             self.carla_status_updated,
             qos_profile=10)
 
@@ -671,19 +671,22 @@ def main(args=None):
     main function
     """
     roscomp.init("manual_control", args=args)
-
+    
     # resolution should be similar to spawned camera with role-name 'view'
     resolution = {"width": 2000, "height": 1500}
 
     pygame.init()
     pygame.font.init()
-    pygame.display.set_caption("CARLA ROS manual control")
-
+    
     try:
         display = pygame.display.set_mode((resolution['width'], resolution['height']),
                                           pygame.HWSURFACE | pygame.DOUBLEBUF)
 
         manual_control_node = ManualControl(resolution)
+        role_name =manual_control_node.get_param("role_name", "ego_vehicle")
+        pygame.display.set_caption("CARLA ROS manual control for "+role_name)
+
+
         clock = pygame.time.Clock()
 
         executor = roscomp.executors.MultiThreadedExecutor()

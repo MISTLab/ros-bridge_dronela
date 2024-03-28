@@ -9,7 +9,7 @@ def generate_launch_description():
         launch.actions.DeclareLaunchArgument(
             name='objects_definition_file',
             default_value=get_package_share_directory(
-                'carla_spawn_objects') + '/objects_hero0.json'
+                'carla_spawn_objects') + '/objects_hero1.json'
         ),
         launch.actions.DeclareLaunchArgument(
             name='role_name',

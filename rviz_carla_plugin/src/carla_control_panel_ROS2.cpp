@@ -175,32 +175,32 @@ void CarlaControlPanel::onInitialize()
   _node = getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
   // set up ros subscriber and publishers
-  mCarlaStatusSubscriber = _node->create_subscription<carla_msgs::msg::CarlaStatus>("/carla/status", 1000, std::bind(&CarlaControlPanel::carlaStatusChanged, this, _1));
-  mCarlaControlPublisher = _node->create_publisher<carla_msgs::msg::CarlaControl>("/carla/control", 10);
+  mCarlaStatusSubscriber = _node->create_subscription<carla_msgs::msg::CarlaStatus>("/status", 1000, std::bind(&CarlaControlPanel::carlaStatusChanged, this, _1));
+  mCarlaControlPublisher = _node->create_publisher<carla_msgs::msg::CarlaControl>("/control", 10);
   mEgoVehicleStatusSubscriber 
-    = _node->create_subscription<carla_msgs::msg::CarlaEgoVehicleStatus>("/carla/ego_vehicle/vehicle_status", 1000, std::bind(&CarlaControlPanel::egoVehicleStatusChanged, this, _1));
+    = _node->create_subscription<carla_msgs::msg::CarlaEgoVehicleStatus>("/ego_vehicle/vehicle_status", 1000, std::bind(&CarlaControlPanel::egoVehicleStatusChanged, this, _1));
   mEgoVehicleOdometrySubscriber
-    = _node->create_subscription<nav_msgs::msg::Odometry>("/carla/ego_vehicle/odometry", 1000, std::bind(&CarlaControlPanel::egoVehicleOdometryChanged, this, _1));
+    = _node->create_subscription<nav_msgs::msg::Odometry>("/ego_vehicle/odometry", 1000, std::bind(&CarlaControlPanel::egoVehicleOdometryChanged, this, _1));
 
   auto qos_latch_10 = rclcpp::QoS( rclcpp::QoSInitialization(RMW_QOS_POLICY_HISTORY_KEEP_LAST, 10));
   qos_latch_10.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
   mCameraPosePublisher
-    = _node->create_publisher<geometry_msgs::msg::Pose>("/carla/ego_vehicle/spectator_pose", qos_latch_10);
+    = _node->create_publisher<geometry_msgs::msg::Pose>("/ego_vehicle/spectator_pose", qos_latch_10);
 
   auto qos_latch_1 = rclcpp::QoS( rclcpp::QoSInitialization(RMW_QOS_POLICY_HISTORY_KEEP_LAST, 1));
   qos_latch_1.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
   mEgoVehicleControlManualOverridePublisher
-    = _node->create_publisher<std_msgs::msg::Bool>("/carla/ego_vehicle/vehicle_control_manual_override", qos_latch_1);
+    = _node->create_publisher<std_msgs::msg::Bool>("/ego_vehicle/vehicle_control_manual_override", qos_latch_1);
 
   mExecuteScenarioClient
     = _node->create_client<carla_ros_scenario_runner_types::srv::ExecuteScenario>("/scenario_runner/execute_scenario");
   mScenarioRunnerStatusSubscriber
     = _node->create_subscription<carla_ros_scenario_runner_types::msg::CarlaScenarioRunnerStatus>("/scenario_runner/status", 10, std::bind(&CarlaControlPanel::scenarioRunnerStatusChanged, this, _1));
 
-  mTwistPublisher = _node->create_publisher<geometry_msgs::msg::Twist>("/carla/ego_vehicle/twist", 1);
+  mTwistPublisher = _node->create_publisher<geometry_msgs::msg::Twist>("/ego_vehicle/twist", 1);
 
   mScenarioSubscriber
-    = _node->create_subscription<carla_ros_scenario_runner_types::msg::CarlaScenarioList>("/carla/available_scenarios", 1, std::bind(&CarlaControlPanel::carlaScenariosChanged, this, _1));
+    = _node->create_subscription<carla_ros_scenario_runner_types::msg::CarlaScenarioList>("/available_scenarios", 1, std::bind(&CarlaControlPanel::carlaScenariosChanged, this, _1));
 }
 
 void CarlaControlPanel::currentViewControllerChanged()

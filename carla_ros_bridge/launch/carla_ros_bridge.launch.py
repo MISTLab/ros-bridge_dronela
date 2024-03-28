@@ -36,7 +36,7 @@ def generate_launch_description():
         ),
         launch.actions.DeclareLaunchArgument(
             name='fixed_delta_seconds',
-            default_value='0.05',
+            default_value='0.02',
             description='Simulation time (delta seconds) between simulation steps'
         ),
         launch.actions.DeclareLaunchArgument(
@@ -51,8 +51,7 @@ def generate_launch_description():
         ),
         launch.actions.DeclareLaunchArgument(
             name='ego_vehicle_role_name',
-            default_value=["hero", "ego_vehicle", "hero0", "hero1", "hero2",
-                           "hero3", "hero4", "hero5", "hero6", "hero7", "hero8", "hero9"],
+            default_value='["hero", "ego_vehicle", "hero0", "hero1", "hero2", "hero3", "hero4", "hero5", "hero6", "hero7", "hero8", "hero9","Giovanni","Vivek","Meiva","Soma","Alice","Ehsan","Hasan","Du","Dong","Koresh"]',
             description='Role names to identify ego vehicles. '
         ),
         launch_ros.actions.Node(

@@ -135,7 +135,7 @@ class CarlaRosBridge(CompatibleNode):
             self.carla_run_state = CarlaControl.PLAY
 
             self.carla_control_subscriber = \
-                self.new_subscription(CarlaControl, "/carla/control",
+                self.new_subscription(CarlaControl, "/control",
                                       lambda control: self.carla_control_queue.put(control.command),
                                       qos_profile=10, callback_group=self.callback_group)
 
@@ -152,16 +152,16 @@ class CarlaRosBridge(CompatibleNode):
 
         # services configuration.
         self._registered_actors = []
-        self.spawn_object_service = self.new_service(SpawnObject, "/carla/spawn_object",
+        self.spawn_object_service = self.new_service(SpawnObject, "/spawn_object",
                                                      self.spawn_object)
-        self.destroy_object_service = self.new_service(DestroyObject, "/carla/destroy_object",
+        self.destroy_object_service = self.new_service(DestroyObject, "/destroy_object",
                                                        self.destroy_object)
 
-        self.get_blueprints_service = self.new_service(GetBlueprints, "/carla/get_blueprints",
+        self.get_blueprints_service = self.new_service(GetBlueprints, "/get_blueprints",
                                                        self.get_blueprints, callback_group=self.callback_group)
 
         self.carla_weather_subscriber = \
-            self.new_subscription(CarlaWeatherParameters, "/carla/weather_control",
+            self.new_subscription(CarlaWeatherParameters, "/weather_control",
                                   self.on_weather_changed, qos_profile=10, callback_group=self.callback_group)
 
     def spawn_object(self, req, response=None):
@@ -432,9 +432,9 @@ def main(args=None):
             carla_bridge.logfatal("CARLA python module version {} required. Found: {}".format(
                 CarlaRosBridge.CARLA_VERSION, dist.version))
             sys.exit(1)
-
-        if LooseVersion(carla_client.get_server_version()) != \
-           LooseVersion(carla_client.get_client_version()):
+        print("server v ",LooseVersion(carla_client.get_server_version()), " client v ", LooseVersion(carla_client.get_client_version()))
+        if str(LooseVersion(carla_client.get_server_version())) != \
+           str(LooseVersion(carla_client.get_client_version())):
             carla_bridge.logwarn(
                 "Version mismatch detected: You are trying to connect to a simulator that might be incompatible with this API. Client API version: {}. Simulator API version: {}"
                 .format(carla_client.get_client_version(),

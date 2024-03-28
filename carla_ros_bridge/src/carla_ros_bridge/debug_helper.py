@@ -31,7 +31,7 @@ class DebugHelper(object):
         """
         self.debug = carla_debug_helper
         self.node = node
-        self.marker_subscriber = self.node.new_subscription(MarkerArray, "/carla/debug_marker",
+        self.marker_subscriber = self.node.new_subscription(MarkerArray, "/debug_marker",
                                                             self.on_marker, qos_profile=10)
 
     def destroy(self):

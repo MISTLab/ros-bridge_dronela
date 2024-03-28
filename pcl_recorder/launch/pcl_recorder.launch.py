@@ -7,7 +7,7 @@ from ament_index_python.packages import get_package_share_directory
 
 
 def launch_enable_autopilot_publisher(context, *args, **kwargs):
-    topic_name = "/carla/" + launch.substitutions.LaunchConfiguration('role_name').perform(context) + "/enable_autopilot"
+    topic_name = "/" + launch.substitutions.LaunchConfiguration('role_name').perform(context) + "/enable_autopilot"
     return [
         launch.actions.ExecuteProcess(
             output="screen",

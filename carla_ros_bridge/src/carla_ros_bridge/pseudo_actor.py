@@ -99,7 +99,7 @@ class PseudoActor(object):
         :return: the final topic name of this object
         :rtype: string
         """
-        return "/carla/" + self.get_prefix()
+        return "/" + self.get_prefix()
 
     def update(self, frame, timestamp):
         """

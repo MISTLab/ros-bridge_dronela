@@ -49,9 +49,9 @@ def generate_launch_description():
             name='carla_twist_to_control',
             remappings=[
                 (
-                    ["/carla/",
+                    ["/",
                         launch.substitutions.LaunchConfiguration('role_name'), "/vehicle_control_cmd"],
-                    ["/carla/",
+                    ["/",
                         launch.substitutions.LaunchConfiguration('role_name'), "/vehicle_control_cmd_manual"]
                 )
             ],
@@ -62,7 +62,7 @@ def generate_launch_description():
             ]
         ),
         launch.actions.ExecuteProcess(
-            cmd=["ros2", "topic", "pub", "/carla/available_scenarios",
+            cmd=["ros2", "topic", "pub", "/available_scenarios",
                  "carla_ros_scenario_runner_types/CarlaScenarioList", ros_topic_msg_string],
             name='topic_pub_vailable_scenarios',
         ),
@@ -123,7 +123,7 @@ def generate_launch_description():
             remappings=[
                 (
                     "carla/ego_vehicle/spectator_pose",
-                    "/carla/ego_vehicle/rgb_view/control/set_transform"
+                    "/ego_vehicle/rgb_view/control/set_transform"
                 )
             ],
             arguments=[
