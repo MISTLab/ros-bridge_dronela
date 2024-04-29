@@ -51,4 +51,21 @@ rosdep install --from-paths src --ignore-src -r
 colcon build
 ```
 
+Basic driver launch: 
+```bash
+source <WS_ROOT>/install/setup.bash
+ros2 launch carla_ros_bridge carla_ros_bridge_with_example_ego_1drone.launch.py # Single drone manual control
+ros2 launch carla_ros_bridge carla_ros_bridge_with_example_ego_2drone.launch.py # two drones maual control
+```
+Manual Control: 
+W - Forward Motion 
+S - Backward Motion
+A - Left Motion
+D - Right MOtion
+
+UP Arrow - Increase altitude.
+Down Arrow - Decrease altitude.
+Left Arrow - Yaw counter clockwise.
+Right Arrow - Yaw clockwise.
+
 instructions and further documentation of the ROS bridge and additional packages are found [__here__](https://carla.readthedocs.io/projects/ros-bridge/en/latest/).
