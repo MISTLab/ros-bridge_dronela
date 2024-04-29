@@ -5,6 +5,9 @@
 
 ![rviz setup](./docs/images/Dronla_rviz.png "AD Demo")
 
+Manual Control using the dronla drivers.
+![rviz setup](./docs/images/simple_github.gif "AD Demo")
+
 **This version requires Dronla 0.9.13**
 
 ## Features
